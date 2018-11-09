@@ -23378,8 +23378,8 @@ ENDSEC
 								pin_image.style.right = "-302px";
 								let person_name = document.getElementById("Name");
 								let plant_date = document.getElementById("Date");
-								person_name.innerHTML = pin_objects[i].object_id;
-								plant_date.innerHTML = pin_objects[i].plant_date;
+								//person_name.innerHTML = pin_objects[i].object_id;
+								//plant_date.innerHTML = pin_objects[i].plant_date;
 
 							}
 							else {
