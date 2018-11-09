@@ -22,7 +22,7 @@
 			min-height: 300;
 			height: 300;
 			width: 300px;
-			border: 1px solid rebeccapurple !important;
+			border: 1px solid green !important;
 			overflow: hidden;
 			z-index: 50;
 			transition: right 1s;
@@ -66,11 +66,11 @@
 		<div id="current_image">
 
 			<img id='my_image' src='../../resources/images/ee.jpg' alt='image' width="auto" height="180" />
-			<img id='my_image' src='../../resources/images/download.png' alt='image' width="auto" height="80" onclick="fbs_click(this)" />
-			<img id='my_image' src='../../resources/images/download1.jpg' alt='image' width="auto" height="80" onclick="twitt_click(this)" />
+			<img id='my_image' src='../../resources/images/facebook.png' alt='image' width="auto" height="40" onclick="fbs_click(this)" />
+			<img id='my_image' src='../../resources/images/twitter.png' alt='image' width="auto" height="40" onclick="twitt_click(this)" />
 
-			<div id="Name">Person name</div>
-			<div id="Date">Plant date</div>
+			<div id="Name"></div>
+			<div id="Date"></div>
 
 		</div>
 
@@ -82,6 +82,7 @@
 	</div>
 
 	<script>
+								pin_image.style.right = "-302px";
 
 		function fbs_click(TheImg) {
 			u = TheImg.src;
@@ -102,15 +103,15 @@
 
 		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-		// viewer.setEDLEnabled(true);
-		// viewer.setFOV(60);
-		// viewer.setPointBudget(1*1000*1000);
-		// viewer.loadSettingsFromURL();
-
-		viewer.setEDLEnabled(false);
+		viewer.setEDLEnabled(true);
 		viewer.setFOV(60);
-		viewer.setPointBudget(1 * 100000);
+		viewer.setPointBudget(1*1000*1000);
 		viewer.loadSettingsFromURL();
+
+		// viewer.setEDLEnabled(false);
+		// viewer.setFOV(60);
+		// viewer.setPointBudget(1 * 100000);
+		// viewer.loadSettingsFromURL();
 
 		viewer.setDescription(" <a target='_blank' href='https://www.facebook.com/people/Tree-Bex/100013519271137'>Developed by TreePex</a>");
 
@@ -132,7 +133,7 @@
 			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 
 			scene.view.position.set(589974.341, 231698.397, 986.146);
-			scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 715.634));
+			scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 615.634));
 			viewer.fitToScreen();
 		});
 
@@ -227,7 +228,9 @@
 				});
 
 
-				for (var i = 0; i < 10; i++) {
+			for (let j = 0; j < 5; j++) {
+
+				for (let i = 0; i < 27; i++) {
 
 
 					let obj = loaded_mesh.clone(true);
@@ -238,17 +241,18 @@
 					var pin = new pin_object("id:" + i, "person name1", "plant date", "person email", "picture", obj);
 					
 
-
 					pin_objects.push(pin);
 
 
-					obj.position.set(589511.587 + i * 100, 231521.213, 753.634);
+					obj.position.set(589999.587 + j * 20, 231557.213 -i * 10, 745.614 + i);
 					obj.scale.multiplyScalar(500);
 					obj.rotation.set(Math.PI / 2, Math.PI, 0)
 
 					viewer.scene.scene.add(obj);
 
 				}
+
+			}
 
 
 

@@ -23281,6 +23281,7 @@ ENDSEC
 		getHoveredElements() {
 	
 
+			
 			let cam = this.viewer.scene.getActiveCamera();
 
 		
@@ -23349,6 +23350,9 @@ ENDSEC
 			// }
 		}
 
+
+
+		
 		//todo: search, tree location based functionality, good facebook share, start from hidden image 
 
 		on_click() {
@@ -23401,7 +23405,7 @@ ENDSEC
 	console.log("can: ",cam);
 
 		
-	cam.position.set( 0, 20, 100 );
+	
 	//this.orbitControls.update();
 
 //this.orbitControls.target(THREE.Vector3(1,1,1));
@@ -23915,6 +23919,7 @@ ENDSEC
 					this.setClipMethod(ClipMethod.INSIDE_ANY);
 
 					//point_budget
+				
 					this.setPointBudget(1 * 1000 * 1000);
 					//this.setPointBudget(1*1*100);
 					this.setShowBoundingBox(false);
