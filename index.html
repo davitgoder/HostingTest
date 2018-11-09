@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Potree Viewer</title>
+
+	<link rel="stylesheet" type="text/css" href="./build/potree/potree.css">
+	<link rel="stylesheet" type="text/css" href="./libs/jquery-ui/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="./libs/perfect-scrollbar/css/perfect-scrollbar.css">
+	<link rel="stylesheet" type="text/css" href="./libs/openlayers3/ol.css">
+	<link rel="stylesheet" type="text/css" href="./libs/spectrum/spectrum.css">
+	<link rel="stylesheet" type="text/css" href="./libs/style/style.css">
+	<link rel="stylesheet" type="text/css" href="./libs/jstree/themes/mixed/style.css">
+	<style>
+		#pin_image {
+			position: absolute;
+			right: 5px;
+			min-height: 300;
+			height: 300;
+			width: 300px;
+			border: 1px solid rebeccapurple !important;
+			overflow: hidden;
+			z-index: 50;
+			transition: right 1s;
+		}
+	</style>
+</head>
+
+
+<body>
+	<script src="./libs/jquery/jquery-3.1.1.min.js"></script>
+	<script src="./libs/spectrum/spectrum.js"></script>
+	<script src="./libs/perfect-scrollbar/js/perfect-scrollbar.jquery.js"></script>
+	<script src="./libs/jquery-ui/jquery-ui.min.js"></script>
+	<script src="./libs/three.js/build/three.min.js"></script>
+	<script src="./libs/three.js/build/Projector.js"></script>
+	<script src="./libs/other/BinaryHeap.js"></script>
+	<script src="./libs/tween/tween.min.js"></script>
+	<script src="./libs/d3/d3.js"></script>
+	<script src="./libs/proj4/proj4.js"></script>
+	<script src="./libs/openlayers3/ol.js"></script>
+	<script src="./libs/i18next/i18next.js"></script>
+	<script src="./libs/jstree/jstree.js"></script>
+	<script src="./build/potree/potree.js"></script>
+	<script src="./libs/plasio/js/laslaz.js"></script>
+	<script src="./libs/other/OBJLoader.js"></script>
+	<script src="./libs/other/PLYLoader.js"></script>
+
+	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
+	<!-- INCLUDE SETTINGS HERE -->
+
+
+
+	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+		<div id="potree_render_area"></div>
+		<!-- <div id="potree_sidebar_container" style="position:absolute; right:100; top:100"> </div> -->
+
+	</div>
+
+	<div id="pin_image">
+
+		<div id="current_image">
+
+			<img id='my_image' src='../../resources/images/ee.jpg' alt='image' width="auto" height="180" />
+			<img id='my_image' src='../../resources/images/download.png' alt='image' width="auto" height="80" onclick="fbs_click(this)" />
+			<img id='my_image' src='../../resources/images/download1.jpg' alt='image' width="auto" height="80" onclick="twitt_click(this)" />
+
+			<div id="Name">Person name</div>
+			<div id="Date">Plant date</div>
+
+		</div>
+
+
+
+
+
+
+	</div>
+
+	<script>
+
+		function fbs_click(TheImg) {
+			u = TheImg.src;
+			// t=document.title;
+			t = TheImg.getAttribute('alt');
+			window.open('http://www.facebook.com/sharer.php?u=' + encodeURIComponent(u) + '&t=' + encodeURIComponent(t), 'sharer', 'toolbar=0,status=0,width=626,height=436'); return false;
+
+		}
+
+		function twitt_click(TheImg) {
+			u = TheImg.src;
+			// t=document.title;
+			t = TheImg.getAttribute('alt');
+			window.open('https://twitter.com/share?url=' + document.URL, 'twitter-popup', 'height=350,width=600'); return false;
+		}
+
+		//let pin_image = document.getElementById("pin_image");
+
+		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+
+		// viewer.setEDLEnabled(true);
+		// viewer.setFOV(60);
+		// viewer.setPointBudget(1*1000*1000);
+		// viewer.loadSettingsFromURL();
+
+		viewer.setEDLEnabled(false);
+		viewer.setFOV(60);
+		viewer.setPointBudget(1 * 100000);
+		viewer.loadSettingsFromURL();
+
+		viewer.setDescription(" <a target='_blank' href='https://www.facebook.com/people/Tree-Bex/100013519271137'>Developed by TreePex</a>");
+
+		// menue_block
+		viewer.loadGUI(() => {
+			viewer.setLanguage('en');
+			$("#menu_tools").next().show();
+			$("#menu_scene").next().show();
+			viewer.toggleSidebar();
+		});
+
+		// Sigeom Poin Cloud
+		Potree.loadPointCloud("./pointclouds/vol_total/cloud.js", "sigeom.sa", function (e) {
+			let scene = viewer.scene;
+			scene.addPointCloud(e.pointcloud);
+
+			let material = e.pointcloud.material;
+			material.size = 1;
+			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+			scene.view.position.set(589974.341, 231698.397, 986.146);
+			scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 715.634));
+			viewer.fitToScreen();
+		});
+
+
+		// { // ANNOTATIONS
+
+		let scene = viewer.scene;
+
+
+
+		// scene.annotations.add(new Potree.Annotation({
+		// 	position: [589808.587, 231525.213, 771.334],
+		// 	title: "Pasha Bank",
+		// 	description: `
+		// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
+		// 		`
+		// }));
+
+
+		// scene.annotations.add(new Potree.Annotation({
+		// 	position: [590041.587, 231525.213, 755.334],
+		// 	title: "Good Green Moving",
+		// 	description: `
+		// 		<img src="./resources/images/ee.jpg" class="pasha-bank-tree"/>
+		// 		`
+		// }));
+
+		// scene.annotations.add(new Potree.Annotation({
+		// 	position: [589930.587, 231525.213, 755.334],
+		// 	title: "pasha bank",
+		// 	description: `
+		// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
+		// 		`
+		// }));
+
+		// scene.annotations.add(new Potree.Annotation({
+		// 	position: [589697.587, 231525.213, 779.334],
+		// 	title: "Good Green Moving",
+		// 	description: `
+		// 		<img src="./resources/images/ee2.png" class="pasha-bank-tree"/>
+		// 		`
+		// }));
+
+		var pin_objects = [];
+
+		class pin_object {
+			constructor(object_id, person_name, plant_date, person_email, pin_picture, mesh_obj) {
+				this.object_id = object_id;
+				this.person_name = person_name;
+				this.plant_date = plant_date;
+				this.person_email = person_email;
+				this.pin_picture = pin_picture;
+				this.mesh_obj = mesh_obj;
+
+			}
+
+		}
+
+		{ // Load Textured bunny from obj
+
+
+
+
+			let manager = new THREE.LoadingManager();
+			let textureLoader = new THREE.TextureLoader(manager);
+
+
+			manager.onProgress = function (item, loaded, total) {
+				console.log(item, loaded, total);
+			};
+
+			let texture = textureLoader.load('./resources/textures/brick_pavement.jpg');
+			let onProgress = function (xhr) {
+				if (xhr.lengthComputable) {
+					let percentComplete = xhr.loaded / xhr.total * 100;
+					console.log(Math.round(percentComplete, 2) + '% downloaded');
+				}
+			};
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+
+
+			let onError = function (xhr) { };
+			let loader = new THREE.OBJLoader(manager);
+
+
+			loader.load('./resources/models/XE.obj', function (loaded_mesh) {
+				loaded_mesh.traverse(function (child) {
+					if (child instanceof THREE.Mesh) {
+						child.material.map = texture;
+					}
+				});
+
+
+				for (var i = 0; i < 10; i++) {
+
+
+					let obj = loaded_mesh.clone(true);
+
+					obj.children[0].name = "id:" + i;
+
+
+					var pin = new pin_object("id:" + i, "person name1", "plant date", "person email", "picture", obj);
+					
+
+
+					pin_objects.push(pin);
+
+
+					obj.position.set(589511.587 + i * 100, 231521.213, 753.634);
+					obj.scale.multiplyScalar(500);
+					obj.rotation.set(Math.PI / 2, Math.PI, 0)
+
+					viewer.scene.scene.add(obj);
+
+				}
+
+
+
+
+
+
+
+
+
+				// loaded_mesh.traverse( function ( child ) {
+
+				// 	   if ( child instanceof THREE.Mesh ) {
+				// 		   child.material.map = texture;
+				// 	   }
+				//    } );
+				//    loaded_mesh.position.set(589871.587, 231528.213, 725.634);
+				//    loaded_mesh.scale.multiplyScalar(500);
+				//    loaded_mesh.rotation.set(Math.PI / 2, Math.PI, 0)
+
+				//    viewer.scene.scene.add( loaded_mesh );
+
+
+
+
+
+
+
+
+
+				// viewer.onGUILoaded(() => {
+				// 	   // Add entries to object list in sidebar
+				// 	   let tree = $(`#jstree_scene`);
+				// 	   let parentNode = "other";
+
+				// 	   let bunnyID = tree.jstree('create_node', parentNode, { 
+				// 			   text: "Bunny Textured", 
+				// 			   icon: './resources/icons/triangle.svg',
+				// 			   data: geometry
+				// 		   }, 
+				// 		   "last", false, false);
+				// 	   tree.jstree(geometry.visible ? "check_node" : "uncheck_node", bunnyID);
+
+
+				// 	   //tree.jstree("open_node", parentNode);
+				//    });
+
+
+
+
+			}, onProgress, onError);
+
+
+			// object_loader( new Array(589891.587, 231528.213, 725.634));
+
+			// for(var i =0; i< 2000; i++)
+			// {
+			// 	object_loader( new Array(589891+ i, 231528.213, 725.634));
+			// }
+
+draw();
+
+function draw() {
+
+    var canvas = document.getElementById('idCanvas');
+    var context = canvas.getContext('2d');
+   
+    var imageObj = new Image();
+    
+
+  imageObj.onload = function() {
+    context.drawImage(imageObj, 0, 0);
+    context.font = "40px Calibri";
+    context.fillStyle = "red";
+    context.fillText("My TEXT!", 50, 300);
+    
+    var canvas = document.getElementById('idCanvas');
+    var dataURL = canvas.toDataURL();
+  
+    alert(dataURL);
+  }
+imageObj.setAttribute('crossOrigin', 'anonymous');
+imageObj.src = "http://lorempixel.com/400/200/";
+};
+
+
+			//TODO: optimize instanciating
+			function object_loader(position) {
+				loader.load('./resources/models/XE.obj', function (object) {
+					object.traverse(function (child) {
+
+						if (child instanceof THREE.Mesh) {
+							child.material.map = texture;
+
+						}
+					});
+
+
+					object.position.set(position[0], position[1], position[2]);
+					object.scale.multiplyScalar(500);
+					object.rotation.set(Math.PI / 2, Math.PI, 0)
+
+					viewer.scene.scene.add(object);
+
+
+				}, onProgress, onError);
+
+
+			}
+
+		}
+
+	</script>
+
+
+</body>
+
+</html>
