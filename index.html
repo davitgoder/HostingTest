@@ -66,8 +66,8 @@
 		<div id="current_image">
 
 			<img id='my_image' src='../../resources/images/ee.jpg' alt='image' width="auto" height="180" />
-			<img id='my_image' src='../../resources/images/facebook.png' alt='image' width="auto" height="40" onclick="fbs_click(this)" />
-			<img id='my_image' src='../../resources/images/twitter.png' alt='image' width="auto" height="40" onclick="twitt_click(this)" />
+			<img id='my_image' src='resources/images/facebook.png' alt='image' width="auto" height="40" onclick="fbs_click(this)" />
+			<img id='my_image' src='resources/images/twitter.png' alt='image' width="auto" height="40" onclick="twitt_click(this)" />
 
 			<div id="Name"></div>
 			<div id="Date"></div>
@@ -82,7 +82,7 @@
 	</div>
 
 	<script>
-								pin_image.style.right = "-302px";
+		pin_image.style.right = "-302px";
 
 		function fbs_click(TheImg) {
 			u = TheImg.src;
@@ -105,7 +105,7 @@
 
 		viewer.setEDLEnabled(true);
 		viewer.setFOV(60);
-		viewer.setPointBudget(1*1000*1000);
+		viewer.setPointBudget(1 * 1000 * 1000);
 		viewer.loadSettingsFromURL();
 
 		// viewer.setEDLEnabled(false);
@@ -228,31 +228,31 @@
 				});
 
 
-			for (let j = 0; j < 5; j++) {
+				for (let j = 0; j < 5; j++) {
 
-				for (let i = 0; i < 27; i++) {
-
-
-					let obj = loaded_mesh.clone(true);
-
-					obj.children[0].name = "id:" + i;
+					for (let i = 0; i < 27; i++) {
 
 
-					var pin = new pin_object("id:" + i, "person name1", "plant date", "person email", "picture", obj);
-					
+						let obj = loaded_mesh.clone(true);
 
-					pin_objects.push(pin);
+						obj.children[0].name = "id:" + i;
 
 
-					obj.position.set(589999.587 + j * 20, 231557.213 -i * 10, 745.614 + i);
-					obj.scale.multiplyScalar(500);
-					obj.rotation.set(Math.PI / 2, Math.PI, 0)
+						var pin = new pin_object("id:" + i, "person name1", "plant date", "person email", "picture", obj);
 
-					viewer.scene.scene.add(obj);
+
+						pin_objects.push(pin);
+
+
+						obj.position.set(589999.587 + j * 20, 231557.213 - i * 10, 745.614 + i);
+						obj.scale.multiplyScalar(500);
+						obj.rotation.set(Math.PI / 2, Math.PI, 0)
+
+						viewer.scene.scene.add(obj);
+
+					}
 
 				}
-
-			}
 
 
 
@@ -312,30 +312,30 @@
 			// 	object_loader( new Array(589891+ i, 231528.213, 725.634));
 			// }
 
-draw();
+			draw();
 
-function draw() {
+			function draw() {
 
-    var canvas = document.getElementById('idCanvas');
-    var context = canvas.getContext('2d');
-   
-    var imageObj = new Image();
-    
+				var canvas = document.getElementById('idCanvas');
+				var context = canvas.getContext('2d');
 
-  imageObj.onload = function() {
-    context.drawImage(imageObj, 0, 0);
-    context.font = "40px Calibri";
-    context.fillStyle = "red";
-    context.fillText("My TEXT!", 50, 300);
-    
-    var canvas = document.getElementById('idCanvas');
-    var dataURL = canvas.toDataURL();
-  
-    alert(dataURL);
-  }
-imageObj.setAttribute('crossOrigin', 'anonymous');
-imageObj.src = "http://lorempixel.com/400/200/";
-};
+				var imageObj = new Image();
+
+
+				imageObj.onload = function () {
+					context.drawImage(imageObj, 0, 0);
+					context.font = "40px Calibri";
+					context.fillStyle = "red";
+					context.fillText("My TEXT!", 50, 300);
+
+					var canvas = document.getElementById('idCanvas');
+					var dataURL = canvas.toDataURL();
+
+					alert(dataURL);
+				}
+				imageObj.setAttribute('crossOrigin', 'anonymous');
+				imageObj.src = "http://lorempixel.com/400/200/";
+			};
 
 
 			//TODO: optimize instanciating
