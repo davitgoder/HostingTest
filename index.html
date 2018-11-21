@@ -27,6 +27,17 @@
 			z-index: 50;
 			transition: right 1s;
 		}
+
+			#seachrbar {
+			position: absolute;	
+			border: 0px solid green !important;
+			overflow: hidden;
+			z-index: 50;
+			transition: right 1s;
+			padding: 0px 0;
+   		    border: 3px solid green;
+    		text-align:center;
+		}
 	</style>
 </head>
 
@@ -49,324 +60,527 @@
 	<script src="./libs/plasio/js/laslaz.js"></script>
 	<script src="./libs/other/OBJLoader.js"></script>
 	<script src="./libs/other/PLYLoader.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+
+	<script type="text/javascript" src="build/potree/potree.js"></script>
+
 
 	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
 	<!-- INCLUDE SETTINGS HERE -->
 
-
-
 	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
 		<div id="potree_render_area"></div>
 		<!-- <div id="potree_sidebar_container" style="position:absolute; right:100; top:100"> </div> -->
-
 	</div>
 
-	<div id="pin_image">
 
-		<div id="current_image">
+	<style>
+		input[type=text] {
+			width: 130px;
+			box-sizing: border-box;
+			border-radius: 10px;
+			font-size: 16px;
+			background-color: white;
+			background-image: url("resources/images/Twitter.png");
+			background-position: 10px 10px; 
+			background-repeat: no-repeat;
+			padding: 12px 20px 12px 40px;
+			-webkit-transition: width 0.4s ease-in-out;
+			transition: width 0.4s ease-in-out;
+		}
+		
+		input[type=text]:focus {
+			width: 100%;
+		}
+		</style>
+	</head>
 
-			<img id='my_image' src='resources/images/ee.jpg' alt='image' width="auto" height="180" />
-			<img id='my_image' src='resources/images/Facebook.png' alt='image' width="auto" height="40" onclick="fbs_click(this)" />
-			<img id='my_image' src='resources/images/Twitter.png' alt='image' width="auto" height="40" onclick="twitt_click(this)" />
+	<body>
 
-			<div id="Name"></div>
-			<div id="Date"></div>
+		<div id="seachrbar" , class="searchbar">
+			<input id="input" onkeyup="search_tree()" type="text" name="search" placeholder="Search..">
+		</div>
+
+		<div id="pin_image" , class="shcreensh">
+
+			<div id="current_image">
+
+				<img id='my_image' src='resources/images/ee.jpg' alt='image' width="auto" height="180" />
+
+				<img id='my_image' src='resources/images/Facebook.png' alt='image' width="auto" height="40" onclick="fbs_click(this) " />
+				<img id='my_image' src='resources/images/Twitter.png' alt='image' width="auto" height="40" onclick="twitt_click(this)" />
+
+				<div id="Name"></div>
+				<div id="Date"></div>
+
+			</div>
 
 		</div>
 
 
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+		<script>
+			window.fbAsyncInit = function () {
+				FB.init({
+					appId: '1986352534789840',
+					cookie: true,  // enable cookies to allow the server to access 
+					// the session
+					xfbml: true,  // parse social plugins on this page
+					version: 'v2.8' // use graph api version 2.8
+					// appId: '1986352534789840',
+					// autoLogAppEvents: true,
+					// xfbml: true,
+					// version: 'v3.2'
+				});
+			};
+
+			(function (d, s, id) {
+				var js, fjs = d.getElementsByTagName(s)[0];
+				if (d.getElementById(id)) { return; }
+				js = d.createElement(s); js.id = id;
+				js.src = "https://connect.facebook.net/en_US/sdk.js";
+				fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+		</script>
+
+		<script>
+
+
+			function search_tree() {
+				var input;
+				input = document.getElementById('input');
+				let search_word = input.value;
+
+				for (let i = 0; i < pin_objects.length; i++) { // todo: optimize serach 
+					if (search_word == "person name1") {
+
+						console.log("ssss: ", pin_objects[i].mesh_obj.position);
+						this.go_to_tree(pin_objects[i].mesh_obj.position);
+					}
+				}
+
+				console.log(input.value);
+			}
+
+
+			function go_to_tree(final_pos) {
+
+
+				console.log("move: ", viewer.scene.cameraO);
+
+
+				viewer.scene.cameraO.position = final_pos;
+				viewer.scene.cameraO.position.x = final_pos.x;
+				viewer.scene.cameraO.position.y = final_pos.y;
+				viewer.scene.cameraO.position.z = final_pos.z + 40;
+			}
+
+			var image_url;
+
+			function report() {
+
+				html2canvas(document.querySelector("body"), {
+					onrendered: function (canvas) {
+						let pngUrl = canvas.toDataURL();
+						let img = document.querySelector(".shcreensh");
+						img.src = pngUrl;
+
+
+						image_url = pngUrl;
+
+						let image = image_url;
+
+
+						var data = image;
+						try {
+							blob = dataURItoBlob(data);
+							console.log("blob:, ", blob)
+						} catch (e) {
+							console.log(e);
+						}
+						FB.getLoginStatus(function (response) {
+							console.log(response);
+							if (response.status === "connected") {
+								postImageToFacebook(response.authResponse.accessToken, "Canvas to Facebook/Twitter", "image/png", blob, window.location.href);
+							} else if (response.status === "not_authorized") {
+								FB.login(function (response) {
+									postImageToFacebook(response.authResponse.accessToken, "Canvas to Facebook/Twitter", "image/png", blob, window.location.href);
+								}, { scope: "publish_actions" });
+							} else {
+								FB.login(function (response) {
+									postImageToFacebook(response.authResponse.accessToken, "Canvas to Facebook/Twitter", "image/png", blob, window.location.href);
+								}, { scope: "publish_actions" });
+							}
+						});
 
 
 
 
-	</div>
-
-	<script>
-		pin_image.style.right = "-302px";
-
-		function fbs_click(TheImg) {
-			u = TheImg.src;
-			// t=document.title;
-			t = TheImg.getAttribute('alt');
-			window.open('http://www.facebook.com/sharer.php?u=' + encodeURIComponent(u) + '&t=' + encodeURIComponent(t), 'sharer', 'toolbar=0,status=0,width=626,height=436'); return false;
-
-		}
-
-		function twitt_click(TheImg) {
-			u = TheImg.src;
-			// t=document.title;
-			t = TheImg.getAttribute('alt');
-			window.open('https://twitter.com/share?url=' + document.URL, 'twitter-popup', 'height=350,width=600'); return false;
-		}
-
-		//let pin_image = document.getElementById("pin_image");
-
-		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
-
-		viewer.setEDLEnabled(true);
-		viewer.setFOV(60);
-		viewer.setPointBudget(1 * 1000 * 1000);
-		viewer.loadSettingsFromURL();
-
-		// viewer.setEDLEnabled(false);
-		// viewer.setFOV(60);
-		// viewer.setPointBudget(1 * 100000);
-		// viewer.loadSettingsFromURL();
-
-		viewer.setDescription(" <a target='_blank' href='https://www.facebook.com/people/Tree-Bex/100013519271137'>Developed by TreePex</a>");
-
-		// menue_block
-		viewer.loadGUI(() => {
-			viewer.setLanguage('en');
-			$("#menu_tools").next().show();
-			$("#menu_scene").next().show();
-			viewer.toggleSidebar();
-		});
-
-		// Sigeom Poin Cloud
-		Potree.loadPointCloud("./pointclouds/vol_total/cloud.js", "sigeom.sa", function (e) {
-			let scene = viewer.scene;
-			scene.addPointCloud(e.pointcloud);
-
-			let material = e.pointcloud.material;
-			material.size = 1;
-			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-
-			scene.view.position.set(589974.341, 231698.397, 986.146);
-			scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 615.634));
-			viewer.fitToScreen();
-		});
-
-
-		// { // ANNOTATIONS
-
-		let scene = viewer.scene;
+					//	console.log("image : ", image);
 
 
 
-		// scene.annotations.add(new Potree.Annotation({
-		// 	position: [589808.587, 231525.213, 771.334],
-		// 	title: "Pasha Bank",
-		// 	description: `
-		// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
-		// 		`
-		// }));
+						//console.log(pngUrl);
+
+						// here you can send 'pngUrl' to server
+					},
+				});
+				return image_url;
+			}
 
 
-		// scene.annotations.add(new Potree.Annotation({
-		// 	position: [590041.587, 231525.213, 755.334],
-		// 	title: "Good Green Moving",
-		// 	description: `
-		// 		<img src="./resources/images/ee.jpg" class="pasha-bank-tree"/>
-		// 		`
-		// }));
+			pin_image.style.right = "-302px";
 
-		// scene.annotations.add(new Potree.Annotation({
-		// 	position: [589930.587, 231525.213, 755.334],
-		// 	title: "pasha bank",
-		// 	description: `
-		// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
-		// 		`
-		// }));
 
-		// scene.annotations.add(new Potree.Annotation({
-		// 	position: [589697.587, 231525.213, 779.334],
-		// 	title: "Good Green Moving",
-		// 	description: `
-		// 		<img src="./resources/images/ee2.png" class="pasha-bank-tree"/>
-		// 		`
-		// }));
+			function dataURItoBlob(dataURI) {
+				console.log("dataURI: " , dataURI)
+				var byteString = atob(dataURI.split(',')[1]);
+				var ab = new ArrayBuffer(byteString.length);
+				var ia = new Uint8Array(ab);
+				for (var i = 0; i < byteString.length; i++) {
+					ia[i] = byteString.charCodeAt(i);
+				}
+				return new Blob([ab], { type: 'image/png' });
+			}
+			function fbs_click(TheImg) {
 
-		var pin_objects = [];
 
-		class pin_object {
-			constructor(object_id, person_name, plant_date, person_email, pin_picture, mesh_obj) {
-				this.object_id = object_id;
-				this.person_name = person_name;
-				this.plant_date = plant_date;
-				this.person_email = person_email;
-				this.pin_picture = pin_picture;
-				this.mesh_obj = mesh_obj;
+
+
+
+				this.report();
+
+
+
+				// var url = "http://www.example.com"; //Set desired URL here
+				// var img = "https://en.wikipedia.org/wiki/Tree#/media/File:Ash_Tree_-_geograph.org.uk_-_590710.jpg"; //Set Desired Image here
+				// var totalurl = encodeURIComponent(url + '?img=' + img);
+
+				// window.open('http://www.facebook.com/sharer.php?u=' + totalurl, '', 'width=500, height=500, scrollbars=yes, resizable=no');
+
+				// u = TheImg.src;
+				// t = document.title;
+				// t = TheImg.getAttribute('alt');
+				// window.open('http://www.facebook.com/sharer.php?u=' + encodeURIComponent(u) + '&t=' + encodeURIComponent(t), 'sharer', 'toolbar=0,status=0,width=626,height=436'); return false;
 
 			}
 
-		}
 
-		{ // Load Textured bunny from obj
-
-
-
-
-			let manager = new THREE.LoadingManager();
-			let textureLoader = new THREE.TextureLoader(manager);
-
-
-			manager.onProgress = function (item, loaded, total) {
-				console.log(item, loaded, total);
-			};
-
-			let texture = textureLoader.load('./resources/textures/brick_pavement.jpg');
-			let onProgress = function (xhr) {
-				if (xhr.lengthComputable) {
-					let percentComplete = xhr.loaded / xhr.total * 100;
-					console.log(Math.round(percentComplete, 2) + '% downloaded');
-				}
-			};
-			texture.wrapS = THREE.RepeatWrapping;
-			texture.wrapT = THREE.RepeatWrapping;
-
-
-			let onError = function (xhr) { };
-			let loader = new THREE.OBJLoader(manager);
-
-
-			loader.load('./resources/models/XE.obj', function (loaded_mesh) {
-				loaded_mesh.traverse(function (child) {
-					if (child instanceof THREE.Mesh) {
-						child.material.map = texture;
+			function publishOnFacebook(share_image) {
+				FB.ui(
+					{
+						method: 'feed',
+						name: 'Facebook Dialogs',
+						link: 'http://localhost/',
+						picture: share_image,
+						caption: 'Reference Documentation',
+						description: 'Dialogs provide a simple, consistent interface for applications to interface with users.'
+					},
+					function (response) {
+						if (response && response.post_id) {
+							alert('Post was published.');
+						} else {
+							alert('Post was not published.');
+						}
 					}
+				);
+			}
+
+
+			function convertURIToImageData(URI) {
+				return new Promise(function (resolve, reject) {
+					if (URI == null) return reject();
+					var canvas = document.createElement('canvas'),
+						context = canvas.getContext('2d'),
+						image = new Image();
+					image.addEventListener('load', function () {
+						canvas.width = image.width;
+						canvas.height = image.height;
+						context.drawImage(image, 0, 0, canvas.width, canvas.height);
+						resolve(context.getImageData(0, 0, canvas.width, canvas.height));
+					}, false);
+					image.src = URI;
 				});
+			}
 
 
-				for (let j = 0; j < 5; j++) {
+			function twitt_click(TheImg) {
+				u = TheImg.src;
+				// t=document.title;
+				t = TheImg.getAttribute('alt');
+				window.open('https://twitter.com/share?url=' + document.URL, 'twitter-popup', 'height=350,width=600'); return false;
+			}
 
-					for (let i = 0; i < 27; i++) {
+			//let pin_image = document.getElementById("pin_image");
+
+			window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+
+			viewer.setEDLEnabled(true);
+			viewer.setFOV(60);
+			viewer.setPointBudget(1 * 1000 * 1000);
+			viewer.loadSettingsFromURL();
+
+			// viewer.setEDLEnabled(false);
+			// viewer.setFOV(60);
+			// viewer.setPointBudget(1 * 100000);
+			// viewer.loadSettingsFromURL();
+
+			viewer.setDescription(" <a target='_blank' href='https://www.facebook.com/people/Tree-Bex/100013519271137'>Developed by TreePex</a>");
+
+			// menue_block
+			viewer.loadGUI(() => {
+				viewer.setLanguage('en');
+				$("#menu_tools").next().show();
+				$("#menu_scene").next().show();
+				viewer.toggleSidebar();
+			});
+
+			// Sigeom Poin Cloud
+			Potree.loadPointCloud("./pointclouds/vol_total/cloud.js", "sigeom.sa", function (e) {
+				let scene = viewer.scene;
+				scene.addPointCloud(e.pointcloud);
+
+				let material = e.pointcloud.material;
+				material.size = 1;
+				material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+				scene.view.position.set(589974.341, 231698.397, 986.146);
+				scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 615.634));
+				viewer.fitToScreen();
+			});
 
 
-						let obj = loaded_mesh.clone(true);
+			// { // ANNOTATIONS
 
-						obj.children[0].name = "id:" + i;
-
-
-						var pin = new pin_object("id:" + i, "person name1", "plant date", "person email", "picture", obj);
+			let scene = viewer.scene;
 
 
-						pin_objects.push(pin);
+
+			// scene.annotations.add(new Potree.Annotation({
+			// 	position: [589808.587, 231525.213, 771.334],
+			// 	title: "Pasha Bank",
+			// 	description: `
+			// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
+			// 		`
+			// }));
 
 
-						obj.position.set(589999.587 + j * 20, 231557.213 - i * 10, 745.614 + i);
-						obj.scale.multiplyScalar(500);
-						obj.rotation.set(Math.PI / 2, Math.PI, 0)
+			// scene.annotations.add(new Potree.Annotation({
+			// 	position: [590041.587, 231525.213, 755.334],
+			// 	title: "Good Green Moving",
+			// 	description: `
+			// 		<img src="./resources/images/ee.jpg" class="pasha-bank-tree"/>
+			// 		`
+			// }));
 
-						viewer.scene.scene.add(obj);
+			// scene.annotations.add(new Potree.Annotation({
+			// 	position: [589930.587, 231525.213, 755.334],
+			// 	title: "pasha bank",
+			// 	description: `
+			// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
+			// 		`
+			// }));
 
+			// scene.annotations.add(new Potree.Annotation({
+			// 	position: [589697.587, 231525.213, 779.334],
+			// 	title: "Good Green Moving",
+			// 	description: `
+			// 		<img src="./resources/images/ee2.png" class="pasha-bank-tree"/>
+			// 		`
+			// }));
+
+			var pin_objects = [];
+
+			class pin_object {
+				constructor(object_id, person_name, plant_date, person_email, pin_picture, mesh_obj) {
+					this.object_id = object_id;
+					this.person_name = person_name;
+					this.plant_date = plant_date;
+					this.person_email = person_email;
+					this.pin_picture = pin_picture;
+					this.mesh_obj = mesh_obj;
+
+				}
+
+			}
+
+			{ // Load Textured bunny from obj
+
+
+
+
+				let manager = new THREE.LoadingManager();
+				let textureLoader = new THREE.TextureLoader(manager);
+
+
+				manager.onProgress = function (item, loaded, total) {
+					console.log(item, loaded, total);
+				};
+
+				let texture = textureLoader.load('./resources/textures/brick_pavement.jpg');
+				let onProgress = function (xhr) {
+					if (xhr.lengthComputable) {
+						let percentComplete = xhr.loaded / xhr.total * 100;
+						console.log(Math.round(percentComplete, 2) + '% downloaded');
 					}
-
-				}
-
-
-
+				};
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
 
 
+				let onError = function (xhr) { };
+				let loader = new THREE.OBJLoader(manager);
 
 
-
-
-				// loaded_mesh.traverse( function ( child ) {
-
-				// 	   if ( child instanceof THREE.Mesh ) {
-				// 		   child.material.map = texture;
-				// 	   }
-				//    } );
-				//    loaded_mesh.position.set(589871.587, 231528.213, 725.634);
-				//    loaded_mesh.scale.multiplyScalar(500);
-				//    loaded_mesh.rotation.set(Math.PI / 2, Math.PI, 0)
-
-				//    viewer.scene.scene.add( loaded_mesh );
-
-
-
-
-
-
-
-
-
-				// viewer.onGUILoaded(() => {
-				// 	   // Add entries to object list in sidebar
-				// 	   let tree = $(`#jstree_scene`);
-				// 	   let parentNode = "other";
-
-				// 	   let bunnyID = tree.jstree('create_node', parentNode, { 
-				// 			   text: "Bunny Textured", 
-				// 			   icon: './resources/icons/triangle.svg',
-				// 			   data: geometry
-				// 		   }, 
-				// 		   "last", false, false);
-				// 	   tree.jstree(geometry.visible ? "check_node" : "uncheck_node", bunnyID);
-
-
-				// 	   //tree.jstree("open_node", parentNode);
-				//    });
-
-
-
-
-			}, onProgress, onError);
-
-
-			// object_loader( new Array(589891.587, 231528.213, 725.634));
-
-			// for(var i =0; i< 2000; i++)
-			// {
-			// 	object_loader( new Array(589891+ i, 231528.213, 725.634));
-			// }
-
-			draw();
-
-			function draw() {
-
-				var canvas = document.getElementById('idCanvas');
-				var context = canvas.getContext('2d');
-
-				var imageObj = new Image();
-
-
-				imageObj.onload = function () {
-					context.drawImage(imageObj, 0, 0);
-					context.font = "40px Calibri";
-					context.fillStyle = "red";
-					context.fillText("My TEXT!", 50, 300);
-
-					var canvas = document.getElementById('idCanvas');
-					var dataURL = canvas.toDataURL();
-
-					alert(dataURL);
-				}
-				imageObj.setAttribute('crossOrigin', 'anonymous');
-				imageObj.src = "http://lorempixel.com/400/200/";
-			};
-
-
-			//TODO: optimize instanciating
-			function object_loader(position) {
-				loader.load('./resources/models/XE.obj', function (object) {
-					object.traverse(function (child) {
-
+				loader.load('./resources/models/XE.obj', function (loaded_mesh) {
+					loaded_mesh.traverse(function (child) {
 						if (child instanceof THREE.Mesh) {
 							child.material.map = texture;
-
 						}
 					});
 
 
-					object.position.set(position[0], position[1], position[2]);
-					object.scale.multiplyScalar(500);
-					object.rotation.set(Math.PI / 2, Math.PI, 0)
+					for (let j = 0; j < 5; j++) {
 
-					viewer.scene.scene.add(object);
+						for (let i = 0; i < 27; i++) {
+
+
+							let obj = loaded_mesh.clone(true);
+
+							obj.children[0].name = "id:" + i;
+
+
+							var pin = new pin_object("id:" + i, "person name1", "plant date", "person email", "picture", obj);
+
+
+							pin_objects.push(pin);
+
+
+							obj.position.set(589999.587 + j * 20, 231557.213 - i * 10, 745.614 + i);
+							obj.scale.multiplyScalar(500);
+							obj.rotation.set(Math.PI / 2, Math.PI, 0)
+
+							viewer.scene.scene.add(obj);
+
+						}
+
+					}
+
+
+
+
+
+
+
+
+
+					// loaded_mesh.traverse( function ( child ) {
+
+					// 	   if ( child instanceof THREE.Mesh ) {
+					// 		   child.material.map = texture;
+					// 	   }
+					//    } );
+					//    loaded_mesh.position.set(589871.587, 231528.213, 725.634);
+					//    loaded_mesh.scale.multiplyScalar(500);
+					//    loaded_mesh.rotation.set(Math.PI / 2, Math.PI, 0)
+
+					//    viewer.scene.scene.add( loaded_mesh );
+
+
+
+
+
+
+
+
+
+					// viewer.onGUILoaded(() => {
+					// 	   // Add entries to object list in sidebar
+					// 	   let tree = $(`#jstree_scene`);
+					// 	   let parentNode = "other";
+
+					// 	   let bunnyID = tree.jstree('create_node', parentNode, { 
+					// 			   text: "Bunny Textured", 
+					// 			   icon: './resources/icons/triangle.svg',
+					// 			   data: geometry
+					// 		   }, 
+					// 		   "last", false, false);
+					// 	   tree.jstree(geometry.visible ? "check_node" : "uncheck_node", bunnyID);
+
+
+					// 	   //tree.jstree("open_node", parentNode);
+					//    });
+
+
 
 
 				}, onProgress, onError);
 
 
+				// object_loader( new Array(589891.587, 231528.213, 725.634));
+
+				// for(var i =0; i< 2000; i++)
+				// {
+				// 	object_loader( new Array(589891+ i, 231528.213, 725.634));
+				// }
+
+				draw();
+
+				function draw() {
+
+					var canvas = document.getElementById('idCanvas');
+					var context = canvas.getContext('2d');
+
+					var imageObj = new Image();
+
+
+					imageObj.onload = function () {
+						context.drawImage(imageObj, 0, 0);
+						context.font = "40px Calibri";
+						context.fillStyle = "red";
+						context.fillText("My TEXT!", 50, 300);
+
+						var canvas = document.getElementById('idCanvas');
+						var dataURL = canvas.toDataURL();
+
+						alert(dataURL);
+					}
+					imageObj.setAttribute('crossOrigin', 'anonymous');
+					imageObj.src = "http://lorempixel.com/400/200/";
+				};
+
+
+				//TODO: optimize instanciating
+				function object_loader(position) {
+					loader.load('./resources/models/XE.obj', function (object) {
+						object.traverse(function (child) {
+
+							if (child instanceof THREE.Mesh) {
+								child.material.map = texture;
+
+							}
+						});
+
+
+						object.position.set(position[0], position[1], position[2]);
+						object.scale.multiplyScalar(500);
+						object.rotation.set(Math.PI / 2, Math.PI, 0)
+
+						viewer.scene.scene.add(object);
+
+
+					}, onProgress, onError);
+
+
+				}
+
 			}
 
-		}
-
-	</script>
+		</script>
 
 
-</body>
+	</body>
 
 </html>
